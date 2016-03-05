@@ -1,52 +1,31 @@
 package exercises
 
-import (
-	"fmt"
-	"time"
+import "fmt"
 
-	"github.com/pesedr/concurrency-exercises/system"
-)
+func GoForWalk() {
+	var alice = &Human{Name: "Alice"}
+	var bob = &Human{Name: "Bob"}
 
-type Human interface {
-	GetReady()
-	ArmAlarm()
-	PutOnShoes()
+	done := make(chan bool)
+	alarm := make(chan bool)
+	go bob.GetReady(done)
+	go alice.GetReady(done)
+	go armAlarm(<-done && <-done, alarm)
+	go bob.PutOnShoes(done)
+	go alice.PutOnShoes(done)
+	if <-done && <-done {
+		fmt.Println("Exiting and locking the door")
+	}
+	if <-alarm {
+		fmt.Println("Alarm is armed")
+	}
+
 }
 
-type human struct {
-	Name string
-}
-
-var Person Human
-
-func init() {
-	Person = &human{}
-}
-
-func (h *human) GetReady() {
-	fmt.Println("%s is getting ready", h)
-	seconds := sleep(60, 90)
-	fmt.Println("%s took %d getting ready", h, seconds)
-}
-
-func (h *human) ArmAlarm() {
-	fmt.Println("%s is arming the alarm", h)
+func armAlarm(done bool, alarm chan bool) {
+	fmt.Println("Arming alarm")
 	sleep(2, 5)
-	fmt.Println("Alarm is armed")
-}
-
-func (h *human) PutOnShoes() {
-	fmt.Println("%s is putting on shoes", h)
-	seconds := sleep(35, 45)
-	fmt.Println("%s took %d seconds putting on shoes", h, seconds)
-}
-
-func sleep(min, max int) int {
-	randomNumber := system.RandomNumberGenerator(min, max)
-	time.Sleep(time.Duration(randomNumber))
-	return randomNumber
-}
-
-func (h *human) String() string {
-	return h.Name
+	fmt.Println("Alarm is counting down")
+	sleep(59, 60)
+	alarm <- true
 }
