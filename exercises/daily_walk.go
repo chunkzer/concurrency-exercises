@@ -6,26 +6,35 @@ func GoForWalk() {
 	var alice = &Human{Name: "Alice"}
 	var bob = &Human{Name: "Bob"}
 
-	done := make(chan bool)
+	one := make(chan bool)
+	two := make(chan bool)
 	alarm := make(chan bool)
-	go bob.GetReady(done)
-	go alice.GetReady(done)
-	go armAlarm(<-done && <-done, alarm)
-	go bob.PutOnShoes(done)
-	go alice.PutOnShoes(done)
-	if <-done && <-done {
-		fmt.Println("Exiting and locking the door")
-	}
-	if <-alarm {
-		fmt.Println("Alarm is armed")
-	}
-
+	go bob.GetReady(one)
+	go alice.GetReady(two)
+	go armAlarm(<-one && <-two, alarm)
+	go alarmCountdown(<-alarm, alarm)
+	go bob.PutOnShoes(one)
+	go alice.PutOnShoes(two)
+	fmt.Println("exiting and locking the door, ", <-one, <-two)
+	fmt.Println("alarm is armed, ", <-alarm)
+	// runtime.Gosched()
 }
 
+func alarmCountdown(alarm bool, c chan bool) {
+	fmt.Println("Alarm is counting down")
+	sleep(59, 60)
+	fmt.Println("Alarm is armed")
+	c <- true
+}
 func armAlarm(done bool, alarm chan bool) {
 	fmt.Println("Arming alarm")
 	sleep(2, 5)
-	fmt.Println("Alarm is counting down")
-	sleep(59, 60)
 	alarm <- true
+}
+
+func leave(done bool) {
+	fmt.Println("Exiting and locking the door")
+}
+
+func armed(alarm bool) {
 }

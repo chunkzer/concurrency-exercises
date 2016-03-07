@@ -1,7 +1,13 @@
 package main
 
-import "github.com/pesedr/concurrency-exercises/exercises"
+import (
+	"math/rand"
+	"time"
+
+	"github.com/pesedr/concurrency-exercises/exercises"
+)
 
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	exercises.GoForWalk()
 }

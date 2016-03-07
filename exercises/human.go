@@ -33,7 +33,7 @@ func (h *Human) PutOnShoes(hasShoes chan bool) {
 
 func sleep(min, max int) int {
 	randomNumber := system.RandomNumberGenerator(min, max)
-	time.Sleep(time.Duration(randomNumber))
+	time.Sleep(time.Duration(randomNumber) * time.Millisecond)
 	return randomNumber
 }
 
