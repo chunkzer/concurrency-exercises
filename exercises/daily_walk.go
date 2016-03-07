@@ -15,9 +15,10 @@ func GoForWalk() {
 	go alarmCountdown(<-alarm, alarm)
 	go bob.PutOnShoes(one)
 	go alice.PutOnShoes(two)
-	fmt.Println("exiting and locking the door, ", <-one, <-two)
-	fmt.Println("alarm is armed, ", <-alarm)
-	// runtime.Gosched()
+	<-one
+	<-two
+	fmt.Println("exiting and locking the door, ")
+	<-alarm
 }
 
 func alarmCountdown(alarm bool, c chan bool) {

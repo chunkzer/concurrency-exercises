@@ -7,12 +7,6 @@ import (
 	"github.com/pesedr/concurrency-exercises/system"
 )
 
-type FamilyMember interface {
-	GetReady()
-	ArmAlarm()
-	PutOnShoes()
-}
-
 type Human struct {
 	Name string
 }
@@ -31,12 +25,12 @@ func (h *Human) PutOnShoes(hasShoes chan bool) {
 	hasShoes <- true
 }
 
+func (h *Human) String() string {
+	return h.Name
+}
+
 func sleep(min, max int) int {
 	randomNumber := system.RandomNumberGenerator(min, max)
 	time.Sleep(time.Duration(randomNumber) * time.Millisecond)
 	return randomNumber
-}
-
-func (h *Human) String() string {
-	return h.Name
 }
