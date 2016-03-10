@@ -9,6 +9,6 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	exercises.GoForWalk()
-	// exercises.EatMeal()
+	// exercises.GoForWalk()
+	exercises.EatMeal()
 }
