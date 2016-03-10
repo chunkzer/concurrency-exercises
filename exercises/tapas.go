@@ -9,31 +9,38 @@ import (
 func makeMeal() {}
 
 func EatMeal() {
-	mealChan := make(chan Meal)
+	mealChan := make(chan bool)
 
-	meal := CreateMeal()
-	mealChan <- meal
+	meal := createMeal()
+	fmt.Printf("%s \n", &meal)
 
 	alice := Human{Name: "Alice"}
 	bob := Human{Name: "Bob"}
 	chancla := Human{Name: "Chancla"}
 	delta := Human{Name: "Delta"}
 
-	go alice.Choose(mealChan)
-	go bob.Choose(mealChan)
-	go chancla.Choose(mealChan)
-	go delta.Choose(mealChan)
-	<-alice.IsReady
-	fmt.Println("alice is done")
+	go alice.Choose(&meal, mealChan)
+	go bob.Choose(&meal, mealChan)
+	go chancla.Choose(&meal, mealChan)
+	go delta.Choose(&meal, mealChan)
+	<-mealChan
+	fmt.Println("That was delicious!")
 }
 
-func CreateMeal() Meal {
+func createMeal() Meal {
 	var dishes [5]Dish
 	var meal Meal
+
 	for i := 0; i < 5; i++ {
 		numOfMorsels := system.RandomNumberGenerator(5, 10)
 		dishes[i].NumMorsel = numOfMorsels
+		meal.Dishes = append(meal.Dishes, dishes[i])
 	}
-	meal.Dishes = dishes
+
+	meal.Dishes[0].Name = "chorizo"
+	meal.Dishes[1].Name = "chopitos"
+	meal.Dishes[2].Name = "patatas bravas"
+	meal.Dishes[3].Name = "pimientos"
+	meal.Dishes[4].Name = "croquetas"
 	return meal
 }
