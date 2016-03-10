@@ -3,6 +3,7 @@ package exercises
 import (
 	"fmt"
 
+	"github.com/pesedr/concurrency-exercises/models"
 	"github.com/pesedr/concurrency-exercises/system"
 )
 
@@ -12,24 +13,26 @@ func EatMeal() {
 	mealChan := make(chan bool)
 
 	meal := createMeal()
-	fmt.Printf("%s \n", &meal)
+	diners := getDiners()
 
-	alice := Human{Name: "Alice"}
-	bob := Human{Name: "Bob"}
-	chancla := Human{Name: "Chancla"}
-	delta := Human{Name: "Delta"}
-
-	go alice.Choose(&meal, mealChan)
-	go bob.Choose(&meal, mealChan)
-	go chancla.Choose(&meal, mealChan)
-	go delta.Choose(&meal, mealChan)
+	for _, diner := range diners {
+		go diner.Choose(&meal, mealChan)
+	}
 	<-mealChan
 	fmt.Println("That was delicious!")
 }
 
-func createMeal() Meal {
-	var dishes [5]Dish
-	var meal Meal
+func getDiners() (diners []*models.Human) {
+	diners = append(diners, &models.Human{Name: "Alice"})
+	diners = append(diners, &models.Human{Name: "Bob"})
+	diners = append(diners, &models.Human{Name: "Chancla"})
+	diners = append(diners, &models.Human{Name: "Delta"})
+	return diners
+}
+
+func createMeal() models.Meal {
+	var dishes [5]models.Dish
+	var meal models.Meal
 
 	for i := 0; i < 5; i++ {
 		numOfMorsels := system.RandomNumberGenerator(5, 10)
@@ -42,5 +45,7 @@ func createMeal() Meal {
 	meal.Dishes[2].Name = "patatas bravas"
 	meal.Dishes[3].Name = "pimientos"
 	meal.Dishes[4].Name = "croquetas"
+
+	fmt.Printf("%s \n", &meal)
 	return meal
 }

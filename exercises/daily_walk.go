@@ -1,35 +1,44 @@
 package exercises
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/pesedr/concurrency-exercises/models"
+	"github.com/pesedr/concurrency-exercises/system"
+)
 
 func GoForWalk() {
-	var alice = &Human{Name: "Alice"}
-	var bob = &Human{Name: "Bob"}
-
+	runners := makeRunners()
+	alarm := make(chan bool)
 	one := make(chan bool)
 	two := make(chan bool)
-	alarm := make(chan bool)
-	go bob.GetReady(one)
-	go alice.GetReady(two)
+
+	go runners[0].GetReady(one)
+	go runners[1].GetReady(two)
 	go armAlarm(<-one && <-two, alarm)
 	go alarmCountdown(<-alarm, alarm)
-	go bob.PutOnShoes(one)
-	go alice.PutOnShoes(two)
+	go runners[0].PutOnShoes(one)
+	go runners[1].PutOnShoes(two)
 	<-one
 	<-two
 	fmt.Println("exiting and locking the door, ")
 	<-alarm
 }
 
+func makeRunners() (runners []models.Human) {
+	runners = append(runners, models.Human{Name: "Alice"})
+	runners = append(runners, models.Human{Name: "Bob"})
+	return runners
+}
 func alarmCountdown(alarm bool, c chan bool) {
 	fmt.Println("Alarm is counting down")
-	sleep(59, 60)
+	system.Sleep(59, 60)
 	fmt.Println("Alarm is armed")
 	c <- true
 }
 func armAlarm(done bool, alarm chan bool) {
 	fmt.Println("Arming alarm")
-	sleep(2, 5)
+	system.Sleep(2, 5)
 	alarm <- true
 }
 
